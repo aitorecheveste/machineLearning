@@ -1,0 +1,815 @@
+#! /Applications/Nuke12.2v3/Nuke12.2v3.app/Contents/MacOS/libnuke-12.2.3.dylib -nx
+version 12.2 v3
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="38" w="1728" h="1051" maximized="1" screen="0">
+        <splitter orientation="1">
+            <split size="40"/>
+            <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                <page id="Toolbar.1"/>
+            </dock>
+            <split size="1065" stretch="1"/>
+            <splitter orientation="2">
+                <split size="605"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+                <split size="426"/>
+                <dock id="" activePageId="DAG.1" focus="true">
+                    <page id="DAG.1"/>
+                    <page id="Curve Editor.1"/>
+                    <page id="DopeSheet.1"/>
+                </dock>
+            </splitter>
+            <split size="615"/>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"/>
+                <page id="uk.co.thefoundry.backgroundrenderview.1"/>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name "/Users/aitorecheveste/Desktop/01 ML Experiment/nuke/01_ML_Experiments_Nuke_templates.nk"
+ frame 90
+ first_frame 0
+ lock_range true
+ format "1920 1080 0 0 1920 1080 1 HD_1080"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement Nuke
+ workingSpaceLUT linear
+ monitorLut sRGB
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+}
+BackdropNode {
+ inputs 0
+ name BackdropNode1
+ tile_color 0x262626ff
+ note_font_size 42
+ xpos -12894
+ ypos 2242
+ bdwidth 2245
+ bdheight 1096
+}
+Dot {
+ inputs 0
+ name Dot4
+ xpos -11953
+ ypos 2497
+ hide_input true
+}
+Crop {
+ box {0 131 1920 949}
+ name Crop2
+ xpos -11987
+ ypos 2561
+}
+Reformat {
+ type scale
+ scale 1.25
+ resize none
+ name Reformat1
+ xpos -11987
+ ypos 2585
+}
+Group {
+ name BBoxToFormat2
+ onCreate "n = nuke.thisNode()\ninputFormat = n.knob(\"inputFormat\")\ninputBBox = n.knob(\"inputBBox\")\ncrop = nuke.toNode(\"Crop6\")\ncropb = crop.knob('box')\noutputBBox = n.knob('outputBBox')\noutputBBoxCenter = n.knob(\"outputBBoxCenter\")\n\ninputFormat.setFlag(0x0000000000008000)\ninputBBox.setFlag(0x0000000000008000)\ncropb.setFlag(0x0000000000008000)\noutputBBox.setFlag(0x0000000000008000)\noutputBBoxCenter.setFlag(0x0000000000008000)\n\nn = nuke.thisNode()\nn.knob(\"overscan\").setRange(0,400)\nn.knob(\"overscanPercent\").setRange(1,4)"
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\nif k.name() == \"overscanType\":\n    if n.knob(\"overscanType\").getValue() == 1:\n        n.knob(\"overscanPercent\").setVisible(True)\n        n.knob(\"overscan\").setVisible(False)\n    else:\n        n.knob(\"overscanPercent\").setVisible(False)\n        n.knob(\"overscan\").setVisible(True)"
+ tile_color 0xa57aaaff
+ note_font "Verdana Bold"
+ note_font_color 0xffffffff
+ xpos -11987
+ ypos 2609
+ addUserKnob {20 CropBBox}
+ addUserKnob {4 type l Type +INVISIBLE M {"To Format" "To BBox"}}
+ addUserKnob {41 intersect T Crop6.intersect}
+ addUserKnob {6 blackOutside l "Black Outside" -STARTLINE}
+ addUserKnob {4 overscanType l "Overscan Type:" M {Pixels Percentage}}
+ overscanType Percentage
+ addUserKnob {14 overscan l Overscan +HIDDEN R 0 400}
+ addUserKnob {14 overscanPercent l "Overscan Percent" R 1 4}
+ overscanPercent 1
+ addUserKnob {20 inputBbox l "BBox Data" n 1}
+ inputBbox 0
+ addUserKnob {15 inputFormat l "Input Format"}
+ inputFormat {0 0 {input.width} {input.height}}
+ addUserKnob {15 inputBBox l "Input BBox"}
+ inputBBox {{input.bbox.x} {input.bbox.y} {input.bbox.r} {input.bbox.t}}
+ addUserKnob {12 outputBBoxCenter l OutputBBoxCenter}
+ outputBBoxCenter {{OutputBBox1.outputBBoxCenter.w} {OutputBBox1.outputBBoxCenter.h}}
+ addUserKnob {15 outputBBox l "Output BBox"}
+ outputBBox {{OutputBBox1.OutputBBox} {OutputBBox1.OutputBBox} {OutputBBox1.OutputBBox} {OutputBBox1.OutputBBox}}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {20 info_1 l Info}
+ addUserKnob {26 creator l Creator: T "<b><big>Tony Lyons"}
+ addUserKnob {26 desc l Description: t "crop to inputformat\n\ndisplays values of input bbox" T CropBBox}
+ addUserKnob {26 ver l Version: T v02}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 261
+  ypos 394
+ }
+ Dot {
+  name Dot2
+  note_font_size 41
+  xpos 295
+  ypos 462
+ }
+set N53df9000 [stack 0]
+ Dot {
+  name Dot1
+  note_font_size 41
+  xpos -160
+  ypos 462
+ }
+set N53df8c00 [stack 0]
+push $N53df9000
+ Crop {
+  box {{curve} {curve} {input.width} {input.height}}
+  crop {{parent.blackOutside}}
+  name Crop6
+  xpos 261
+  ypos 510
+  addUserKnob {20 User}
+  addUserKnob {22 cropToBbox l "Crop to Bounding Box" -STARTLINE T codeBBox()}
+ }
+set N53df8800 [stack 0]
+ Remove {
+  operation keep
+  channels none
+  name Remove1
+  xpos 120
+  ypos 504
+ }
+set N53df8400 [stack 0]
+ Transform {
+  scale {{parent.overscanPercent} {parent.overscanPercent}}
+  center {{input.bbox.r/2} {input.bbox.t/2}}
+  shutteroffset centred
+  name Transform1
+  xpos 120
+  ypos 555
+ }
+push $N53df8400
+ AdjBBox {
+  numpixels {{parent.overscan} {parent.overscan}}
+  name AdjBBox1
+  xpos -5
+  ypos 510
+ }
+ Switch {
+  inputs 2
+  which {{overscanType}}
+  name Switch2
+  label "\[value which]"
+  xpos -5
+  ypos 549
+ }
+ Merge2 {
+  inputs 2
+  bbox intersection
+  Achannels {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  Bchannels {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  output {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  name Merge1
+  xpos -5
+  ypos 647
+  disable {{!parent.Crop6.intersect}}
+ }
+push $N53df8c00
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  xpos -194
+  ypos 653
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos -194
+  ypos 692
+  disable {{!parent.blackOutside}}
+ }
+ Dot {
+  name Dot4
+  note_font_size 41
+  xpos -160
+  ypos 769
+ }
+push $N53df8800
+ Switch {
+  inputs 2
+  which {{"overscanType == 0 ? overscan.w != 0 || overscan.h != 0 : overscanPercent.w != 1 || overscanPercent.h != 1 ? 1 : 0"}}
+  name Switch1
+  label "\[value which]"
+  xpos 261
+  ypos 759
+ }
+set N53b5b900 [stack 0]
+ Output {
+  name Output1
+  xpos 261
+  ypos 921
+ }
+push $N53b5b900
+ NoOp {
+  name OutputBBox1
+  selected true
+  xpos 378
+  ypos 821
+  addUserKnob {20 User}
+  addUserKnob {15 OutputBBox l "Output BBox"}
+  OutputBBox {{input.bbox.x} {input.bbox.y} {input.bbox.r} {input.bbox.t}}
+  addUserKnob {14 outputBBoxCenter l "Output BBox Center" R 0 100}
+  outputBBoxCenter {{OutputBBox.x+(OutputBBox.r-OutputBBox.x)/2} {OutputBBox.y+(OutputBBox.t-OutputBBox.y)/2}}
+ }
+end_group
+Invert {
+ channels alpha
+ name Invert1
+ xpos -11987
+ ypos 2635
+}
+FilterErode {
+ channels alpha
+ size -10
+ filter gaussian
+ name FilterErode3
+ xpos -11987
+ ypos 2667
+}
+Inpaint2 {
+ center {960 540}
+ name Inpaint2
+ xpos -11987
+ ypos 2699
+}
+SmartVector {
+ name SmartVector3
+ xpos -11987
+ ypos 2768
+}
+Reformat {
+ type scale
+ scale 0.8
+ resize none
+ black_outside true
+ pbb true
+ name Reformat2
+ xpos -11987
+ ypos 2859
+}
+AdjBBox {
+ numpixels -1
+ name AdjBBox2
+ xpos -11987
+ ypos 2883
+}
+VectorDistort {
+ reference_frame_set true
+ outputMode st-map
+ last_output_mode st-map
+ name VectorDistort1
+ xpos -11987
+ ypos 2989
+}
+Expression {
+ expr0 r*1.25
+ expr1 g*1.25
+ expr2 0
+ name Expression1
+ xpos -11987
+ ypos 3013
+}
+Dot {
+ inputs 0
+ name Dot5
+ xpos -12451
+ ypos 2513
+ hide_input true
+}
+Crop {
+ box {0 131 1920 949}
+ name Crop6
+ xpos -12485
+ ypos 2598
+}
+Invert {
+ channels alpha
+ name Invert3
+ xpos -12485
+ ypos 2622
+}
+Group {
+ name BBoxToFormat3
+ onCreate "n = nuke.thisNode()\ninputFormat = n.knob(\"inputFormat\")\ninputBBox = n.knob(\"inputBBox\")\ncrop = nuke.toNode(\"Crop6\")\ncropb = crop.knob('box')\noutputBBox = n.knob('outputBBox')\noutputBBoxCenter = n.knob(\"outputBBoxCenter\")\n\ninputFormat.setFlag(0x0000000000008000)\ninputBBox.setFlag(0x0000000000008000)\ncropb.setFlag(0x0000000000008000)\noutputBBox.setFlag(0x0000000000008000)\noutputBBoxCenter.setFlag(0x0000000000008000)\n\nn = nuke.thisNode()\nn.knob(\"overscan\").setRange(0,400)\nn.knob(\"overscanPercent\").setRange(1,4)"
+ knobChanged "n = nuke.thisNode()\nk = nuke.thisKnob()\nif k.name() == \"overscanType\":\n    if n.knob(\"overscanType\").getValue() == 1:\n        n.knob(\"overscanPercent\").setVisible(True)\n        n.knob(\"overscan\").setVisible(False)\n    else:\n        n.knob(\"overscanPercent\").setVisible(False)\n        n.knob(\"overscan\").setVisible(True)"
+ tile_color 0xa57aaaff
+ note_font "Verdana Bold"
+ note_font_color 0xffffffff
+ xpos -12485
+ ypos 2654
+ addUserKnob {20 CropBBox}
+ addUserKnob {4 type l Type +INVISIBLE M {"To Format" "To BBox"}}
+ addUserKnob {41 intersect T Crop6.intersect}
+ addUserKnob {6 blackOutside l "Black Outside" -STARTLINE}
+ addUserKnob {4 overscanType l "Overscan Type:" M {Pixels Percentage}}
+ overscanType Percentage
+ addUserKnob {14 overscan l Overscan +HIDDEN R 0 400}
+ addUserKnob {14 overscanPercent l "Overscan Percent" R 1 4}
+ overscanPercent 1
+ addUserKnob {20 inputBbox l "BBox Data" n 1}
+ inputBbox 0
+ addUserKnob {15 inputFormat l "Input Format"}
+ inputFormat {0 0 {input.width} {input.height}}
+ addUserKnob {15 inputBBox l "Input BBox"}
+ inputBBox {{input.bbox.x} {input.bbox.y} {input.bbox.r} {input.bbox.t}}
+ addUserKnob {12 outputBBoxCenter l OutputBBoxCenter}
+ outputBBoxCenter {{OutputBBox1.outputBBoxCenter.w} {OutputBBox1.outputBBoxCenter.h}}
+ addUserKnob {15 outputBBox l "Output BBox"}
+ outputBBox {{OutputBBox1.OutputBBox} {OutputBBox1.OutputBBox} {OutputBBox1.OutputBBox} {OutputBBox1.OutputBBox}}
+ addUserKnob {20 endGroup n -1}
+ addUserKnob {20 info_1 l Info}
+ addUserKnob {26 creator l Creator: T "<b><big>Tony Lyons"}
+ addUserKnob {26 desc l Description: t "crop to inputformat\n\ndisplays values of input bbox" T CropBBox}
+ addUserKnob {26 ver l Version: T v02}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 261
+  ypos 394
+ }
+ Dot {
+  name Dot2
+  note_font_size 41
+  xpos 295
+  ypos 462
+ }
+set N8db7c800 [stack 0]
+ Dot {
+  name Dot1
+  note_font_size 41
+  xpos -160
+  ypos 462
+ }
+set N8db7c400 [stack 0]
+push $N8db7c800
+ Crop {
+  box {{curve} {curve} {input.width} {input.height}}
+  crop {{parent.blackOutside}}
+  name Crop6
+  xpos 261
+  ypos 510
+  addUserKnob {20 User}
+  addUserKnob {22 cropToBbox l "Crop to Bounding Box" -STARTLINE T codeBBox()}
+ }
+set N781fbc00 [stack 0]
+ Remove {
+  operation keep
+  channels none
+  name Remove1
+  xpos 120
+  ypos 504
+ }
+set N781fb800 [stack 0]
+ Transform {
+  scale {{parent.overscanPercent} {parent.overscanPercent}}
+  center {{input.bbox.r/2} {input.bbox.t/2}}
+  shutteroffset centred
+  name Transform1
+  xpos 120
+  ypos 555
+ }
+push $N781fb800
+ AdjBBox {
+  numpixels {{parent.overscan} {parent.overscan}}
+  name AdjBBox1
+  xpos -5
+  ypos 510
+ }
+ Switch {
+  inputs 2
+  which {{overscanType}}
+  name Switch2
+  label "\[value which]"
+  xpos -5
+  ypos 549
+ }
+ Merge2 {
+  inputs 2
+  bbox intersection
+  Achannels {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  Bchannels {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  output {-rgba.red -rgba.green -rgba.blue rgba.alpha}
+  name Merge1
+  xpos -5
+  ypos 647
+  disable {{!parent.Crop6.intersect}}
+ }
+push $N8db7c400
+ CopyBBox {
+  inputs 2
+  name CopyBBox1
+  xpos -194
+  ypos 653
+ }
+ BlackOutside {
+  name BlackOutside1
+  xpos -194
+  ypos 692
+  disable {{!parent.blackOutside}}
+ }
+ Dot {
+  name Dot4
+  note_font_size 41
+  xpos -160
+  ypos 769
+ }
+push $N781fbc00
+ Switch {
+  inputs 2
+  which {{"overscanType == 0 ? overscan.w != 0 || overscan.h != 0 : overscanPercent.w != 1 || overscanPercent.h != 1 ? 1 : 0"}}
+  name Switch1
+  label "\[value which]"
+  xpos 261
+  ypos 759
+ }
+set N78206b00 [stack 0]
+ Output {
+  name Output1
+  xpos 261
+  ypos 921
+ }
+push $N78206b00
+ NoOp {
+  name OutputBBox1
+  selected true
+  xpos 378
+  ypos 821
+  addUserKnob {20 User}
+  addUserKnob {15 OutputBBox l "Output BBox"}
+  OutputBBox {{input.bbox.x} {input.bbox.y} {input.bbox.r} {input.bbox.t}}
+  addUserKnob {14 outputBBoxCenter l "Output BBox Center" R 0 100}
+  outputBBoxCenter {{OutputBBox.x+(OutputBBox.r-OutputBBox.x)/2} {OutputBBox.y+(OutputBBox.t-OutputBBox.y)/2}}
+ }
+end_group
+Inpaint2 {
+ center {960 540}
+ name Inpaint4
+ xpos -12485
+ ypos 2680
+}
+SmartVector {
+ name SmartVector6
+ xpos -12485
+ ypos 2772
+}
+VectorDistort {
+ referenceFrame 50
+ reference_frame_set true
+ outputMode st-map
+ last_output_mode st-map
+ name VectorDistort2
+ xpos -12485
+ ypos 2892
+}
+StickyNote {
+ inputs 0
+ name StickyNote2
+ label footage
+ xpos -12483
+ ypos 2475
+}
+StickyNote {
+ inputs 0
+ name StickyNote4
+ label "inpaint cropping area"
+ note_font_size 20
+ xpos -12532
+ ypos 2400
+}
+StickyNote {
+ inputs 0
+ name StickyNote5
+ label "inpaint cropping area\nand overscan"
+ note_font_size 20
+ xpos -12032
+ ypos 2387
+}
+StickyNote {
+ inputs 0
+ name StickyNote6
+ label "dissolve between few stmaps"
+ note_font_size 20
+ xpos -11497
+ ypos 2393
+}
+StickyNote {
+ inputs 0
+ name StickyNote3
+ label STMap
+ xpos -11431
+ ypos 2472
+}
+StickyNote {
+ inputs 0
+ name StickyNote1
+ label footage
+ xpos -11988
+ ypos 2458
+}
+Dot {
+ inputs 0
+ name Dot16
+ xpos -11398
+ ypos 2515
+ hide_input true
+}
+Dot {
+ name Dot6
+ xpos -11398
+ ypos 2563
+}
+set N8db7dc00 [stack 0]
+Dot {
+ name Dot7
+ xpos -11237
+ ypos 2563
+}
+set N78273c00 [stack 0]
+Dot {
+ name Dot8
+ xpos -11094
+ ypos 2563
+}
+add_layer {sm50 sm50.red sm50.green}
+Shuffle {
+ in sm50
+ name Shuffle1
+ label 100
+ xpos -11128
+ ypos 2653
+}
+set N78273400 [stack 0]
+Dot {
+ name Dot9
+ xpos -11035
+ ypos 2660
+}
+Dot {
+ name Dot10
+ xpos -11035
+ ypos 2938
+}
+push $N78273400
+FrameHold {
+ first_frame 50
+ name FrameHold1
+ xpos -11128
+ ypos 2685
+}
+Group {
+ inputs 0
+ name UV_Map1
+ help "Create an uvmap from the input format or the selected format that can be used for example for baking transformations and applying them through a STmap node.\nUse the overscan to create values outside of the viewing window and the 0-1 range."
+ tile_color 0x578100ff
+ note_font "Bitstream Vera Sans"
+ note_font_color 0xffffffff
+ xpos -11567
+ ypos 2756
+ mapsize {0.15 0.15}
+ addUserKnob {20 tab l "UV Map"}
+ addUserKnob {41 format T Constant1.format}
+ addUserKnob {41 scale l overscan T Reformat1.scale}
+ addUserKnob {6 alpha l "alpha 1" +STARTLINE}
+ alpha true
+ addUserKnob {41 black_outside l "black outside" -STARTLINE T Reformat2.black_outside}
+}
+ Input {
+  inputs 0
+  name Input
+  xpos 620
+  ypos -370
+ }
+ Shuffle {
+  red black
+  green black
+  blue black
+  alpha black
+  name Shuffle1
+  xpos 620
+  ypos -309
+ }
+ Constant {
+  inputs 0
+  name Constant1
+  xpos 479
+  ypos -214
+ }
+ Switch {
+  inputs 2
+  which {{"\[exists parent.input0]"}}
+  name Switch1
+  xpos 620
+  ypos -190
+ }
+ Reformat {
+  type scale
+  scale 1.25
+  pbb true
+  name Reformat1
+  xpos 620
+  ypos -113
+ }
+ Reformat {
+  type scale
+  scale {{1/Reformat1.scale} {1/Reformat1.scale}}
+  resize none
+  black_outside true
+  pbb true
+  name Reformat2
+  selected true
+  xpos 620
+  ypos -79
+ }
+ Shuffle {
+  alpha white
+  name Shuffle13
+  tile_color 0xffffff00
+  label "\[value in]"
+  xpos 620
+  ypos 12
+  disable {{!parent.alpha}}
+ }
+ Expression {
+  expr0 (x+0.5)/width
+  expr1 (y+0.5)/height
+  name Expression2
+  xpos 620
+  ypos 75
+ }
+ Output {
+  name Output1
+  xpos 620
+  ypos 127
+ }
+end_group
+AdjBBox {
+ numpixels -1
+ name AdjBBox3
+ xpos -11567
+ ypos 2780
+}
+set N786fbc00 [stack 0]
+Dot {
+ name Dot11
+ xpos -11160
+ ypos 2783
+}
+BlinkScript {
+ inputs 2
+ recompileCount 2
+ ProgramGroup 1
+ KernelDescription "2 \"InverseSTKernel\" iterate pixelWise a5a117a2b5ca03f616b00de8228529e430a6bd8a02bbae0fea88e74253dd6f52 3 \"src\" Read Point \"stmap\" Read Point \"dst\" Write Random 1 \"resolution\" Float 2 AAAAAAAAAAA= 1 \"resolution\" 2 1 0"
+ kernelSource "kernel InverseSTKernel : ImageComputationKernel<ePixelWise>\n\{\n  Image<eRead, eAccessPoint, eEdgeClamped> src;\n  Image<eRead, eAccessPoint, eEdgeClamped> stmap;\n  Image<eWrite, eAccessRandom> dst;\n\n  param:\n    float2 resolution;\n\n  void process() \{\n    float2 uv;\n    uv.x = stmap().x * resolution.x - 0.5f;\n    uv.y = stmap().y * resolution.y - 0.5f;\n    //always make sure that you don't write outside bounds\n    //as it will usually crash nuke.\n    if (dst.bounds.inside(uv.x,uv.y)) \{ \n      dst(uv.x,uv.y) = src(); \n    \}\n  \}\n\};"
+ vectorize false
+ rebuild ""
+ InverseSTKernel_resolution {1920 1080}
+ rebuild_finalise ""
+ name BlinkScript1
+ xpos -11128
+ ypos 2826
+}
+Inpaint2 {
+ fillRegion "Source Inverted Alpha"
+ center {960 540}
+ name Inpaint5
+ xpos -11128
+ ypos 2911
+}
+STMap {
+ inputs 2
+ channels rgba
+ uv rgba
+ name STMap1
+ xpos -11128
+ ypos 2935
+}
+push 0
+push $N78273c00
+add_layer {sm20 sm20.red sm20.green}
+Shuffle {
+ in sm20
+ name Shuffle2
+ label 50
+ xpos -11271
+ ypos 2656
+}
+Dot {
+ name Dot12
+ xpos -11237
+ ypos 2944
+}
+push $N8db7dc00
+add_layer {sm00 sm00.red sm00.green sm00.blue sm00.alpha}
+Shuffle {
+ in sm00
+ name Shuffle3
+ label 00
+ xpos -11432
+ ypos 2655
+}
+set N786f9c00 [stack 0]
+Dot {
+ name Dot13
+ xpos -11322
+ ypos 2662
+}
+Dot {
+ name Dot14
+ xpos -11322
+ ypos 2946
+}
+push $N786f9c00
+FrameHold {
+ first_frame 50
+ name FrameHold2
+ xpos -11432
+ ypos 2687
+}
+push $N786fbc00
+Dot {
+ name Dot15
+ xpos -11533
+ ypos 2841
+}
+BlinkScript {
+ inputs 2
+ recompileCount 2
+ ProgramGroup 1
+ KernelDescription "2 \"InverseSTKernel\" iterate pixelWise a5a117a2b5ca03f616b00de8228529e430a6bd8a02bbae0fea88e74253dd6f52 3 \"src\" Read Point \"stmap\" Read Point \"dst\" Write Random 1 \"resolution\" Float 2 AAAAAAAAAAA= 1 \"resolution\" 2 1 0"
+ kernelSource "kernel InverseSTKernel : ImageComputationKernel<ePixelWise>\n\{\n  Image<eRead, eAccessPoint, eEdgeClamped> src;\n  Image<eRead, eAccessPoint, eEdgeClamped> stmap;\n  Image<eWrite, eAccessRandom> dst;\n\n  param:\n    float2 resolution;\n\n  void process() \{\n    float2 uv;\n    uv.x = stmap().x * resolution.x - 0.5f;\n    uv.y = stmap().y * resolution.y - 0.5f;\n    //always make sure that you don't write outside bounds\n    //as it will usually crash nuke.\n    if (dst.bounds.inside(uv.x,uv.y)) \{ \n      dst(uv.x,uv.y) = src(); \n    \}\n  \}\n\};"
+ vectorize false
+ rebuild ""
+ InverseSTKernel_resolution {1920 1080}
+ rebuild_finalise ""
+ name BlinkScript2
+ xpos -11432
+ ypos 2834
+}
+Inpaint2 {
+ fillRegion "Source Inverted Alpha"
+ center {960 540}
+ name Inpaint6
+ xpos -11432
+ ypos 2919
+}
+STMap {
+ inputs 2
+ channels rgba
+ uv rgba
+ name STMap2
+ xpos -11432
+ ypos 2943
+}
+Dissolve {
+ inputs 3+1
+ which {{curve 0 x50 1 2}}
+ name Dissolve1
+ xpos -11432
+ ypos 3115
+}
+Dot {
+ name Dot1
+ xpos -11398
+ ypos 3230
+}
+Dot {
+ inputs 0
+ name Dot2
+ xpos -11528
+ ypos 3153
+ hide_input true
+}
+STMap {
+ inputs 2
+ name STMap3
+ xpos -11562
+ ypos 3223
+}
+StickyNote {
+ inputs 0
+ name StickyNote7
+ label footage
+ xpos -11559
+ ypos 3099
+}
